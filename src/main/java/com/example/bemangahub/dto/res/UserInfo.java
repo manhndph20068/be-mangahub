@@ -22,4 +22,5 @@ public class UserInfo {
     private Integer isVerified;
     private String type;
     private String role;
+
 }

@@ -15,6 +15,7 @@ import java.time.Instant;
 @Builder
 public class RefreshToken {
     private String token;
+    private String email;
     private Instant expiryDate;
     private String type;
     private UserInfo userInfo;

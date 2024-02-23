@@ -44,6 +44,23 @@ import java.util.Date;
                         "JOIN role r ON a.role_id = r.id " +
                         "WHERE t.name = 'SYSTEM' and a.email = :email",
                 resultSetMapping = "UserInfoMappingResult"
+        ),
+        @NamedNativeQuery(
+                name = "UserSocialInfoMappingQuery",
+                query = "SELECT a.username AS username, " +
+                        "a.email AS email, " +
+                        "a.avatar AS avatar, " +
+                        "a.created_at AS createdAt, " +
+                        "a.updated_at AS updatedAt, " +
+                        "a.refresh_token AS refreshToken, " +
+                        "a.is_verified AS isVerified, " +
+                        "t.name AS type, " +
+                        "r.name AS role " +
+                        "FROM account a " +
+                        "JOIN type t ON a.type_id = t.id " +
+                        "JOIN role r ON a.role_id = r.id " +
+                        "WHERE t.name = :type and a.email = :email",
+                resultSetMapping = "UserInfoMappingResult"
         )
 })
 

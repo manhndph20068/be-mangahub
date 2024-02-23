@@ -3,30 +3,30 @@ package com.example.bemangahub;
 import java.io.Serializable;
 
 public class ServiceResult<T> implements Serializable {
-    private int status;
+    private int statusCode;
     private String message;
     private T data;
 
     public ServiceResult() {
     }
 
-    public ServiceResult(int status, String message, T data) {
-        this.status = status;
+    public ServiceResult(int statusCode, String message, T data) {
+        this.statusCode = statusCode;
         this.message = message;
         this.data = data;
     }
 
-    public ServiceResult(int status, String message) {
-        this.status = status;
+    public ServiceResult(int statusCode, String message) {
+        this.statusCode = statusCode;
         this.message = message;
     }
 
-    public int getStatus() {
-        return status;
+    public int getStatusCode() {
+        return statusCode;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
     }
 
     public String getMessage() {

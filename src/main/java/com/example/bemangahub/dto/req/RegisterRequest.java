@@ -1,4 +1,4 @@
-package com.example.bemangahub.dto;
+package com.example.bemangahub.dto.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

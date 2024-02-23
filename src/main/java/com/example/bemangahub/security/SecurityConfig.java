@@ -41,7 +41,12 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v1/auth/loginWithCerdential","/api/v1/auth/signUp","/api/v1/auth/refreshToken").permitAll()
+                        auth.requestMatchers("/api/v1/auth/loginWithCredential",
+                                "/api/v1/auth/getInforSocialAccount",
+                                "/api/v1/auth/refreshToken",
+                                "/api/v1/auth/signUpCredential",
+                                "/api/v1/auth/loginWithSocial"
+                                ).permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
                                 .anyRequest().authenticated()
 
