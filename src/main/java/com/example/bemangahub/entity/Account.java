@@ -30,7 +30,8 @@ import java.util.Date;
 @NamedNativeQueries({
         @NamedNativeQuery(
                 name = "UserCerdentialInfoMappingQuery",
-                query = "SELECT a.username AS username, " +
+                query = "SELECT a.id AS id, " +
+                        "a.username AS username, " +
                         "a.email AS email, " +
                         "a.avatar AS avatar, " +
                         "a.created_at AS createdAt, " +
@@ -47,7 +48,8 @@ import java.util.Date;
         ),
         @NamedNativeQuery(
                 name = "UserSocialInfoMappingQuery",
-                query = "SELECT a.username AS username, " +
+                query = "SELECT a.id AS id, " +
+                        "a.username AS username, " +
                         "a.email AS email, " +
                         "a.avatar AS avatar, " +
                         "a.created_at AS createdAt, " +
@@ -69,6 +71,7 @@ import java.util.Date;
         classes = @ConstructorResult(
                 targetClass = UserInfo.class,
                 columns = {
+                        @ColumnResult(name = "id", type = Integer.class),
                         @ColumnResult(name = "username", type = String.class),
                         @ColumnResult(name = "email", type = String.class),
                         @ColumnResult(name = "avatar", type = String.class),

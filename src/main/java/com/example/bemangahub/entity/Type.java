@@ -27,6 +27,6 @@ public class Type {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "code")
+    @Column(name = "status")
     private Integer status;
 }

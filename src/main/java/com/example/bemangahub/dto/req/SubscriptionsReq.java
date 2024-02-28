@@ -9,10 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class RegisterRequest {
+public class SubscriptionsReq {
+    private Integer idAccount;
+    private String idComic;
     private String name;
-    private String email;
-    private String password;
-    private Integer idRole;
-    private Integer idType;
+    private String image;
 }

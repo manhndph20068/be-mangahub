@@ -13,6 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserInfo {
+    private Integer id;
     private String username;
     private String email;
     private String avatar;
