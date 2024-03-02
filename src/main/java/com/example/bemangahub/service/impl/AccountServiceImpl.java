@@ -130,4 +130,14 @@ public class AccountServiceImpl implements IAccountService {
             return false;
         }
     }
+
+    @Override
+    public Account findByEmailAndPassword(String email, String password) {
+        Account account = accountRepository.findByEmail(email);
+        if (account != null && passwordEncoder.matches(password, account.getPassword())) {
+            return account;
+        } else {
+            return null;
+        }
+    }
 }

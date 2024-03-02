@@ -45,10 +45,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/getInforSocialAccount",
                                 "/api/v1/auth/refreshToken",
                                 "/api/v1/auth/signUpCredential",
-                                "/api/v1/auth/loginWithSocial",
-                                "/api/v1/subscriptions/findSubscriptionsByAccountId",
-                                "/api/v1/subscriptions/saveSubscription",
-                                "/api/v1/subscriptions/deleteSubscription"
+                                "/api/v1/auth/loginWithSocial"
                                 ).permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
                                 .anyRequest().authenticated()

@@ -52,6 +52,7 @@ public class AuthController {
     }
 
     @PostMapping("/getInforSocialAccount")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getInforSocialAccount(@RequestBody RefreshToken refreshToken) {
         try {
             return ResponseEntity.ok(iAccountService.inforSocialAccount(refreshToken.getEmail(), refreshToken.getType()));
@@ -82,10 +83,10 @@ public class AuthController {
         Boolean isTypeExits = iTypeService.isTypeExist(authRequest.getType());
         if (isTypeExits) {
             if (isEmailSocialExits) {
-                String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), authRequest.getType());
-                String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), authRequest.getType());
-                jwtService.setRefreshTokenCookie(refreshToken, response);
                 ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), authRequest.getType());
+                String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
+                String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
+                jwtService.setRefreshTokenCookie(refreshToken, response);
                 return ResponseEntity.status(HttpStatus.OK).body(new ServiceResult<>(AppConstant.SUCCESS, "Login success", LoginResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
@@ -93,10 +94,11 @@ public class AuthController {
                         .build()));
             } else {
                 Account account = iAccountService.createSocialAccount(authRequest.getEmail(), authRequest.getType());
-                String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), authRequest.getType());
-                String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), authRequest.getType());
-                jwtService.setRefreshTokenCookie(refreshToken, response);
                 ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), authRequest.getType());
+                String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
+                String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
+                jwtService.setRefreshTokenCookie(refreshToken, response);
+
                 if (account != null) {
                     return ResponseEntity.status(HttpStatus.OK).body(new ServiceResult<>(AppConstant.SUCCESS, "Login success", LoginResponse.builder()
                             .accessToken(accessToken)
@@ -115,58 +117,68 @@ public class AuthController {
     @PostMapping("/loginWithCredential")
     public ResponseEntity<?> loginWithCredential(@RequestBody AuthRequest authRequest, HttpServletResponse response) {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
-            if (authentication.isAuthenticated()) {
-                String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), "SYSTEM");
-                String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), "SYSTEM");
-                jwtService.setRefreshTokenCookie(refreshToken, response);
-                ServiceResult<UserInfo> userInfoOptional = iAccountService.inforCerdentialAccount(authRequest.getEmail());
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new ServiceResult<>(AppConstant.SUCCESS, "Login success"
-                                , LoginResponse.builder()
-                                .accessToken(accessToken)
-                                .refreshToken(refreshToken)
-                                .userInfo(userInfoOptional.getData())
-                                .build()));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ServiceResult<>(
-                                AppConstant.BAD_REQUEST,
-                                "Đăng nhập that bai",
-                                null));
-            }
+            ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), "SYSTEM");
+                    if (userInfoOptional.getData() != null) {
+                        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userInfoOptional.getData().getId(), authRequest.getPassword()));
+                        if (authentication.isAuthenticated()) {
+                            String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), "SYSTEM", userInfoOptional.getData().getId());
+                            String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), "SYSTEM", userInfoOptional.getData().getId());
+                            jwtService.setRefreshTokenCookie(refreshToken, response);
+                            return ResponseEntity.status(HttpStatus.OK).body(
+                                    new ServiceResult<>(AppConstant.SUCCESS, "Login success"
+                                            , LoginResponse.builder()
+                                            .accessToken(accessToken)
+                                            .refreshToken(refreshToken)
+                                            .userInfo(userInfoOptional.getData())
+                                            .build()));
+
+                        } else {
+                            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                                    new ServiceResult<>(AppConstant.FAIL, "Invalid credentials", null));
+                        }
+                    }else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServiceResult<>(
+                                AppConstant.BAD_REQUEST, "account not found", null));
+                    }
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServiceResult<>(
-                    AppConstant.BAD_REQUEST,
-                    "Đăng nhập thất bại: Email hoặc mật khẩu không hợp lệ",
-                    null));
+                    AppConstant.BAD_REQUEST, e.toString(), null));
         }
     }
 
     @PostMapping("/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshToken refreshToken) {
         try {
-            String email = jwtService.extractEmail(refreshToken.getToken());
-            String accessToken = jwtService.generateAccessToken(email, refreshToken.getType());
+            String email = jwtService.extractTokenToEmail(refreshToken.getToken());
             if (refreshToken.getType() == "SYSTEM") {
                 ServiceResult<UserInfo> userInfoOptional = iAccountService.inforCerdentialAccount(email);
-                return ResponseEntity.status(HttpStatus.OK).body(LoginResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken.getToken())
-                        .userInfo(userInfoOptional.getData())
-                        .build());
+                String accessToken = jwtService.generateAccessToken(email, refreshToken.getType(),userInfoOptional.getData().getId());
+                return ResponseEntity.status(HttpStatus.OK).body(new ServiceResult<>(
+                        AppConstant.SUCCESS,
+                        "refresh",
+                        LoginResponse.builder()
+                                .accessToken(accessToken)
+                                .refreshToken(refreshToken.getToken())
+                                .userInfo(userInfoOptional.getData())
+                                .build()));
             } else if (refreshToken.getType() != "SYSTEM" && iTypeService.isTypeExist(refreshToken.getType())) {
                 ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(email, refreshToken.getType());
-                return ResponseEntity.status(HttpStatus.OK).body(LoginResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken.getToken())
-                        .userInfo(userInfoOptional.getData())
-                        .build());
+                String accessToken = jwtService.generateAccessToken(email, refreshToken.getType(),userInfoOptional.getData().getId());
+                return ResponseEntity.status(HttpStatus.OK).body(new ServiceResult<>(
+                        AppConstant.ERROR,
+                        "refresh",
+                        LoginResponse.builder()
+                                .accessToken(accessToken)
+                                .refreshToken(refreshToken.getToken())
+                                .userInfo(userInfoOptional.getData())
+                                .build()) );
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Type không hợp lệ");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServiceResult<>(
+                        AppConstant.ERROR, "Type không hợp lệ", null));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Refresh token không hợp lệ");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServiceResult<>(
+                    AppConstant.BAD_REQUEST, "Refresh token không hợp lệ", null));
         }
     }
 }

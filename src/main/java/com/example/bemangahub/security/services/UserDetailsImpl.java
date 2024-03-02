@@ -11,17 +11,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
-    private String name;
+    private String id;
     private String password;
     private List<GrantedAuthority> authorities;
 
     public UserDetailsImpl(Account account) {
-        name = account.getEmail();
+        id = account.getId().toString();
         password = account.getPassword();
         authorities = Arrays.stream(account.getRole().getName().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -35,7 +36,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return name;
+        return id;
     }
 
     @Override
@@ -57,4 +58,5 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

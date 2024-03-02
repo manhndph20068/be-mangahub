@@ -21,4 +21,6 @@ public interface IAccountService {
     Account createCredentialAccount(String email,String password, String type);
 
     Boolean exitsEmailSocial(String email, String type);
+
+    Account findByEmailAndPassword(String email, String password);
 }

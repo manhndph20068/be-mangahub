@@ -18,7 +18,8 @@ public class CorsConfig {
                         .addMapping("/**")
                         .allowedMethods(CorsConfiguration.ALL)
                         .allowedHeaders(CorsConfiguration.ALL)
-                        .allowedOriginPatterns(CorsConfiguration.ALL);
+                        .allowedOriginPatterns(CorsConfiguration.ALL)
+                        .allowCredentials(true);
             }
         };
     }

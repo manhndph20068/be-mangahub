@@ -18,6 +18,16 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     @Query(nativeQuery = true, name = "UserSocialInfoMappingQuery")
     Optional<UserInfo> findSocialByEmail(@Param("email") String email, @Param("type") String type);
 
-    @Query("SELECT a FROM Account a JOIN a.role r JOIN a.type t WHERE a.email = :email AND t.name = :typeName")
-    Optional<Account> findByEmailAndTypeName(@Param("email") String email, @Param("typeName") String typeName);
+//    @Query("SELECT a FROM Account a JOIN a.role r JOIN a.type t WHERE a.email = :email AND t.name = :typeName")
+//    Optional<Account> findByEmailAndTypeName(@Param("email") String email, @Param("typeName") String typeName);
+
+//    @Query("SELECT a FROM Account a JOIN a.role r JOIN a.type t WHERE a.email = :email")
+//    Optional<Account> findByEmailAndTypeName(@Param("email") String email);
+
+
+    @Query("SELECT a FROM Account a JOIN a.role r JOIN a.type t WHERE a.id = :id")
+    Optional<Account> findById(@Param("id") Integer id);
+
+    Account findByEmail(String email);
+
 }

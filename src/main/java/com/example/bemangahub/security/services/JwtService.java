@@ -1,6 +1,5 @@
 package com.example.bemangahub.security.services;
 
-import com.example.bemangahub.dto.res.RefreshToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,16 +9,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +29,15 @@ public class JwtService {
     public String extractEmail(String token) {
         Claims claims = extractAllClaims(token);
         System.out.println("Claims: " + claims);
+        return extractClaim(token, claims1 -> claims.get("id", String.class));
+    }
+
+    public String extractTokenToEmail(String token) {
+        Claims claims = extractAllClaims(token);
+        System.out.println("Claims: " + claims);
         return extractClaim(token, claims1 -> claims.get("sub", String.class));
     }
+
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -54,21 +54,23 @@ public class JwtService {
                 .getBody();
     }
 
-    public String generateAccessToken(String email, String type) {
+    public String generateAccessToken(String email, String type, Integer id) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", type);
+        claims.put("id", id.toString());
         return createAccessToken(claims, email);
     }
 
-    public String generateRefreshToken(String email, String type) {
+    public String generateRefreshToken(String email, String type, Integer id) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", type);
+        claims.put("id", id.toString());
         return createRefreshToken(claims, email);
     }
 
     private String createAccessToken(Map<String, Object> claims, String email) {
         long currentTimeMillis = System.currentTimeMillis();
-        long expirationMillis = currentTimeMillis + (18000 * 10000);
+        long expirationMillis = currentTimeMillis + (10 * 60 * 1000);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(email)
@@ -101,7 +103,6 @@ public class JwtService {
     public String createRefreshToken(Map<String, Object> claims, String email) {
         long currentTimeMillis = System.currentTimeMillis();
         long expirationMillis = currentTimeMillis + (30L * 24 * 60 * 60 * 1000);
-
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(email)
@@ -117,10 +118,10 @@ public class JwtService {
         Date currentDate = new Date();
         long maxAgeSeconds = (expirationDate.getTime() - currentDate.getTime()) / 1000;
         Cookie cookie = new Cookie("mangahub_r_token", refreshToken);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setMaxAge(Math.toIntExact(maxAgeSeconds));
         cookie.setPath("/");
-        cookie.setSecure(true);
+        cookie.setSecure(false);
         response.addCookie(cookie);
     }
 
