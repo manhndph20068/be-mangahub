@@ -118,7 +118,7 @@ public class JwtService {
         Date currentDate = new Date();
         long maxAgeSeconds = (expirationDate.getTime() - currentDate.getTime()) / 1000;
         Cookie cookie = new Cookie("mangahub_r_token", refreshToken);
-        cookie.setHttpOnly(false);
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(Math.toIntExact(maxAgeSeconds));
         cookie.setPath("/");
         cookie.setSecure(false);

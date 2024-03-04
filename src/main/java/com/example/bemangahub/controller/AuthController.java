@@ -82,8 +82,8 @@ public class AuthController {
         Boolean isEmailSocialExits = iAccountService.exitsEmailSocial(authRequest.getEmail(), authRequest.getType());
         Boolean isTypeExits = iTypeService.isTypeExist(authRequest.getType());
         if (isTypeExits) {
+            ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), authRequest.getType());
             if (isEmailSocialExits) {
-                ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), authRequest.getType());
                 String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
                 String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
                 jwtService.setRefreshTokenCookie(refreshToken, response);
@@ -94,7 +94,6 @@ public class AuthController {
                         .build()));
             } else {
                 Account account = iAccountService.createSocialAccount(authRequest.getEmail(), authRequest.getType());
-                ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), authRequest.getType());
                 String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
                 String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
                 jwtService.setRefreshTokenCookie(refreshToken, response);
