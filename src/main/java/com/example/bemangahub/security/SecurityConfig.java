@@ -41,13 +41,13 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v1/auth/loginWithCredential",
-                                "/api/v1/auth/getInforSocialAccount",
-                                "/api/v1/auth/refreshToken",
-                                "/api/v1/auth/signUpCredential",
-                                "/api/v1/auth/loginWithSocial"
-                                ).permitAll()
-                                .requestMatchers("/api/test/**").permitAll()
+                        auth.requestMatchers("/api-be/v1/auth/loginWithCredential",
+                                "/api-be/v1/auth/getInforSocialAccount",
+                                "/api-be/v1/auth/refreshToken",
+                                "/api-be/v1/auth/signUpCredential",
+                                "/api-be/v1/auth/loginWithSocial"
+                        ).permitAll()
+                                .requestMatchers("/api-be/test/**").permitAll()
                                 .anyRequest().authenticated()
 
                 );

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api-be/v1/auth")
 public class AuthController {
 
     @Autowired
@@ -82,8 +82,8 @@ public class AuthController {
         Boolean isEmailSocialExits = iAccountService.exitsEmailSocial(authRequest.getEmail(), authRequest.getType());
         Boolean isTypeExits = iTypeService.isTypeExist(authRequest.getType());
         if (isTypeExits) {
-            ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), authRequest.getType());
             if (isEmailSocialExits) {
+                ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), authRequest.getType());
                 String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
                 String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
                 jwtService.setRefreshTokenCookie(refreshToken, response);
@@ -94,10 +94,10 @@ public class AuthController {
                         .build()));
             } else {
                 Account account = iAccountService.createSocialAccount(authRequest.getEmail(), authRequest.getType());
+                ServiceResult<UserInfo> userInfoOptional = iAccountService.inforSocialAccount(authRequest.getEmail(), authRequest.getType());
                 String accessToken = jwtService.generateAccessToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
                 String refreshToken = jwtService.generateRefreshToken(authRequest.getEmail(), authRequest.getType(),userInfoOptional.getData().getId());
                 jwtService.setRefreshTokenCookie(refreshToken, response);
-
                 if (account != null) {
                     return ResponseEntity.status(HttpStatus.OK).body(new ServiceResult<>(AppConstant.SUCCESS, "Login success", LoginResponse.builder()
                             .accessToken(accessToken)

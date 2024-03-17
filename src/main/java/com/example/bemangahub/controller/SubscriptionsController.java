@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/subscriptions")
+@RequestMapping("/api-be/v1/subscriptions")
 public class SubscriptionsController {
     @Autowired
     private ISubscriptionsService iSubscriptionsService;
