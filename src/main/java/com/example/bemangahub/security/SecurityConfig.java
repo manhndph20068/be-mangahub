@@ -45,7 +45,8 @@ public class SecurityConfig {
                                 "/api-be/v1/auth/getInforSocialAccount",
                                 "/api-be/v1/auth/refreshToken",
                                 "/api-be/v1/auth/signUpCredential",
-                                "/api-be/v1/auth/loginWithSocial"
+                                "/api-be/v1/auth/loginWithSocial",
+                                "/api-be/v1/redis/**"
                         ).permitAll()
                                 .requestMatchers("/api-be/test/**").permitAll()
                                 .anyRequest().authenticated()
